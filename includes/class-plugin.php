@@ -53,6 +53,9 @@ class PermlogPlugin {
     // we blithely respond on the update_option_wp_user_roles, we'll never be
     // able to compare before-and after.
     add_filter( 'civicrm_validateForm', ['PermlogPlugin', 'civicrmValidateForm'], 10, 5 );
+
+    // Register a "log entries list" page for this plugin.
+    add_action('admin_menu', array('PermlogLogList', 'addViewLogMenu'), 9);
 	}
 
   /**
@@ -196,27 +199,43 @@ class PermlogPlugin {
    * @param array $diff
    */
   public static function log($diff) {
+    // Note current user amd time.
+    $current_user = wp_get_current_user();
+    $timestamp = time();
+    
+    // Convert $diff to lines we can print.
     $diffLines = self::formatDiff($diff);
 
-    $metaLines = [];
-    $current_user = wp_get_current_user();
-    $metaLines['User'] = "{$current_user->user_login} (id={$current_user->ID})";
-    $metaLines['Referer'] = $_SERVER['HTTP_REFERER'];
+    // Build and populate an array of header lines.
+    $headerLines = [];
+    $headerLines['User'] = "{$current_user->user_login} (id={$current_user->ID})";
+    $headerLines['Referer'] = $_SERVER['HTTP_REFERER'];
+    $headerLines['Timestamp'] = date('Y-m-d H:i:s', $timestamp);
 
-    $timestamp = time();
-    $metaLines['Timestamp'] = date('Y-m-d H:i:s', $timestamp);
+    // Build and poplate an array of metadata to store in filename.
+    // (The logList viewer presents this data in a table, and it's easier to get
+    // it from the filename than from reading each file.)
+    $rolesAffected = array_unique(
+      array_merge(
+        array_keys($diff['added'] ?? []),
+        array_keys($diff['removed'] ?? [])
+      )
+    );
+    $actions = array_keys($diff);
+    $fileNameMeta = [
+      'u' => $current_user->ID,
+      't' => $timestamp,
+      'r' => $rolesAffected,
+      'a' => $actions,
+    ];
+    
+    // Create the filename based on that filename metadata.
+    $fileName = PermlogUtil::encodeFilename($timestamp, $fileNameMeta);
 
-    $fileName = date('Y-m-d_H:i:s', $timestamp) . '.log';
-
-    $uploadDir = wp_upload_dir('', FALSE);
-    $myLogDir = $uploadDir['basedir'] . '/' . 'permlog';
-    if (!is_dir($myLogDir)) {
-      mkdir($myLogDir);
-    }
-    $logFile = $myLogDir . '/' . $fileName;
-
+    // Wrtie the log file
+    $logFile = PermlogUtil::getLogDir() . '/' . $fileName;
     $fp = fopen($logFile, 'w');
-    foreach ($metaLines as $label => $value) {
+    foreach ($headerLines as $label => $value) {
       fputs($fp, "{$label}\t{$value}\n");
     }
     fputs($fp, "--\n");

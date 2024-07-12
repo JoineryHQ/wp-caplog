@@ -14,7 +14,7 @@
  *
  * @wordpress-plugin
  * Plugin Name:       Permissions Logger
- * Plugin URI:        https://joineryhq.com
+ * Plugin URI:        https://github.com/JoineryHQ/wp-permlog
  * Description:       Log all changes to WordPress role permissions
  * Version:           1.0.0
  * Author:            Allen Shaw
@@ -34,7 +34,9 @@ if ( ! defined( 'WPINC' ) ) {
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-require plugin_dir_path( __FILE__ ) . 'includes/class-plugin.php';
+require plugin_dir_path(__FILE__) . 'includes/class-plugin.php';
+require plugin_dir_path(__FILE__) . 'includes/class-logList.php';
+require plugin_dir_path(__FILE__) . 'includes/class-util.php';
 
 /**
  * Begins execution of the plugin.
