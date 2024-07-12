@@ -55,7 +55,12 @@ class PermlogPlugin {
     add_filter( 'civicrm_validateForm', ['PermlogPlugin', 'civicrmValidateForm'], 10, 5 );
 
     // Register a "log entries list" page for this plugin.
-    add_action('admin_menu', array('PermlogLogList', 'addViewLogMenu'), 9);
+    add_action('admin_menu', array('PermlogLogViewer', 'addLogViewerMenu'), 9);
+
+    // Add a CSS file for the log viewer.
+    // Reference https://developer.wordpress.org/reference/hooks/admin_enqueue_scripts/
+    add_action('admin_enqueue_scripts', ['PermlogLogViewer', 'enqueueScripts']);
+
 	}
 
   /**
@@ -202,7 +207,7 @@ class PermlogPlugin {
     // Note current user amd time.
     $current_user = wp_get_current_user();
     $timestamp = time();
-    
+
     // Convert $diff to lines we can print.
     $diffLines = self::formatDiff($diff);
 
@@ -213,7 +218,7 @@ class PermlogPlugin {
     $headerLines['Timestamp'] = date('Y-m-d H:i:s', $timestamp);
 
     // Build and poplate an array of metadata to store in filename.
-    // (The logList viewer presents this data in a table, and it's easier to get
+    // (The log list presents this data in a table, and it's easier to get
     // it from the filename than from reading each file.)
     $rolesAffected = array_unique(
       array_merge(
@@ -228,7 +233,7 @@ class PermlogPlugin {
       'r' => $rolesAffected,
       'a' => $actions,
     ];
-    
+
     // Create the filename based on that filename metadata.
     $fileName = PermlogUtil::encodeFilename($timestamp, $fileNameMeta);
 

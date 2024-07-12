@@ -1,0 +1,19 @@
+table#permlog-headers {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+table#permlog-headers th {
+  text-align: right;
+}
+table#permlog-headers td {
+  text-align: left;
+  padding-left: 1em;
+}
+
+table#permlog-rows td.permlog-action-removed {
+  color: red; 
+}
+table#permlog-rows td.permlog-action-added {
+  color: green; 
+}

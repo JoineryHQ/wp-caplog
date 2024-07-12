@@ -1,39 +1,68 @@
 <?php
 
 /**
- * The core plugin class.
+ * The logViewer.
  */
-class PermlogLogList {
+class PermlogLogViewer {
+
+  public static function enqueueScripts($hook) {
+    if ($hook == 'users_page_permlog_logviewer') {
+      // Add our own custom css.
+      wp_register_style("permlog-logviewer-css", plugins_url('admin/css/logviewer.css', dirname(__FILE__)), array(), filemtime(plugin_dir_path(dirname(__FILE__)) . 'admin/css/logviewer.css'));
+      wp_enqueue_style('permlog-logviewer-css');
+    }
+  }
 
   /**
    * Hook listener for admin_menu.
-   * 
-   * Add a menu item for logList viewer.
+   *
+   * Add a menu item for log viewer.
    */
-  public static function addViewLogMenu() {
+  public static function addLogViewerMenu() {
     add_submenu_page(
       'users.php',
       'Permissions Logger: Log Entries',
       'Permissions Logger',
       'edit_users',
-      'permlog_loglist',
-      ['PermlogLogList', 'logListHtml']
+      'permlog_logviewer',
+      ['PermlogLogViewer', 'logViewerHtml']
     );
   }
 
   /**
-   * Page callback for permlog_loglist menu item.
+   * Page callback for permlog_logviewer menu item.
    */
-  public static function logListHtml() {  
+  public static function logViewerHtml() {
+    echo '<div class="wrap">';
+
     // check user capabilities; if not 'edit_users', print nothing.
     if (!current_user_can('edit_users')) {
-      echo '<div class="wrap">Permisison denied.</div>';
-      return;
+      echo 'Permisison denied.';
     }
-    
-    $pluginData = PermlogUtil::getPluginData();    
+    elseif(!empty($_GET['file'])) {
+      self::logSingleHtml($_GET['file']);
+    }
+    else {
+      self::logListHtml();
+    }
+
+    echo '</div>';
+  }
+
+  public static function logSingleHtml($fileName) {
+    ?>
+      <h1 class="wp-heading-inline">Permissions Logger: View Log Entry</h1>
+      <a href="admin.php?page=permlog_logviewer" class="page-title-action">All Log Entries</a>
+    <?php
+
+    echo PermlogUtil::formatSingleLog($fileName);
+  }
+
+  public static function logListHtml() {
+
+    $pluginData = PermlogUtil::getPluginData();
     $logEntries = PermlogUtil::getLogEntriesFormatted();
-    
+
     ?>
     <div class="wrap">
       <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
@@ -59,13 +88,12 @@ class PermlogLogList {
               <td><?= $logEntry['roles'] ?></td>
               <td><?= $logEntry['added'] ?></td>
               <td><?= $logEntry['removed'] ?></td>
-              <td><a href="#<?= $logEntry['filename'] ?>">View</a></td>
+              <td><a href="admin.php?page=permlog_logviewer&file=<?= $logEntry['filename'] ?>">View</a></td>
             </tr>
           <?php endforeach; ?>
         </tbody>
       </table>
-    </div>
-    
+
     <?php
   }
 

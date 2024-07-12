@@ -59,7 +59,7 @@ class PermlogUtil {
   }
 
   /**
-   * Given an array of file metadata, format it for display in logList.
+   * Given an array of file metadata, format it for display in log list.
    *
    * @staticvar array $users Static cache for usernames per id.
    * @param array $metaData
@@ -85,7 +85,7 @@ class PermlogUtil {
   }
 
   /**
-   * Format a boolean value for display in logList.
+   * Format a boolean value for display in log list.
    *
    * @param bool $bool
    * @return string
@@ -95,7 +95,7 @@ class PermlogUtil {
   }
 
   /**
-   * Get a full, ordered list of log entries, formatted for display in logList.
+   * Get a full, ordered list of log entries, formatted for display in log list.
    *
    * @return array
    */
@@ -105,11 +105,70 @@ class PermlogUtil {
     $logFiles = array_reverse($logFiles);
     $logEntries = [];
     foreach ($logFiles as $logFile) {
-      $metaData = self::decodeFilename($logFile);
-      $metaData['filename'] = $logFile;
+      $fileName = basename($logFile);
+      $metaData = self::decodeFilename($fileName);
+      $metaData['filename'] = $fileName;
       $formatted = self::formatLogMeta($metaData);
       $logEntries[] = $formatted;
     }
     return $logEntries;
+  }
+
+  /**
+   * Format a single log entry for display in the log viewer.
+   * @param string $fileName Base filename of the given log file.
+   */
+  public static function formatSingleLog($fileName) {
+    $logFile = self::getLogDir() . '/' . $fileName;
+    $lines = file($logFile);
+
+    $headerData = [];
+    $rowData = [];
+    $pastRowMarker = FALSE;
+    foreach ($lines as $line) {
+      if (trim($line) == '--') {
+        $pastRowMarker = TRUE;
+        continue;
+      }
+      if (!$pastRowMarker) {
+        list($label, $value) = explode("\t", $line);
+        $headerData[$label] = $value;
+      }
+      else {
+        $rowData[] = explode("\t", $line);
+      }
+    }
+    ?>
+
+    <?php if (!empty($headerData)) : ?>
+      <table id="permlog-headers"><tbody>
+      <?php foreach ($headerData as $label => $value) : ?>
+        <tr><th class="permlog-label"><?= $label ?></th><td><?= $value ?></td></tr>
+      <?php endforeach;?>
+      </tbody></table>
+    <?php endif; ?>
+
+    <?php if (!empty($rowData)) : ?>
+      <table id="permlog-rows" class="wp-list-table widefat fixed striped table-view-list">
+        <thead>
+          <tr>
+            <th>Action</th>
+            <th>Permission</th>
+            <th>Role</th>
+          </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($rowData as $row) : ?>
+          <tr>
+            <td class="permlog-action permlog-action-<?= $row[0] ?>"><?= $row[0] ?></td>
+            <td><?= $row[2] ?></td>
+            <td><?= $row[1] ?></td>
+          </tr>
+        <?php endforeach; ?>
+        </tbody>
+      </table>
+    <?php endif; ?>
+
+    <?php
   }
 }

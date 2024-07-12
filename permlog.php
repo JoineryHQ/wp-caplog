@@ -35,7 +35,7 @@ if ( ! defined( 'WPINC' ) ) {
  * admin-specific hooks, and public-facing site hooks.
  */
 require plugin_dir_path(__FILE__) . 'includes/class-plugin.php';
-require plugin_dir_path(__FILE__) . 'includes/class-logList.php';
+require plugin_dir_path(__FILE__) . 'includes/class-logViewer.php';
 require plugin_dir_path(__FILE__) . 'includes/class-util.php';
 
 /**
