@@ -34,7 +34,7 @@ if ( ! defined( 'WPINC' ) ) {
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-require plugin_dir_path( __FILE__ ) . 'includes/class-permlog.php';
+require plugin_dir_path( __FILE__ ) . 'includes/class-plugin.php';
 
 /**
  * Begins execution of the plugin.
@@ -47,7 +47,7 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-permlog.php';
  */
 function run_permlog() {
 
-	$plugin = new Permlog();
+	$plugin = new PermlogPlugin();
 	$plugin->run();
 
 }
