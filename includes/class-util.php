@@ -73,7 +73,8 @@ class PermlogUtil {
     }
 
     $ret = [
-      'timestamp' => date('Y-m-d H:i:s', $metaData['t']),
+      // (We always use Unix timestamps on save, and format/tz-adjust them on display.
+      'timestamp' => wp_date('Y-m-d H:i:s', $metaData['t']),
       'roles' => implode(', ', $metaData['r']),
       'added' => self::formatBoolean(in_array('added', $metaData['a'])),
       'removed' => self::formatBoolean(in_array('removed', $metaData['a'])),
@@ -133,12 +134,18 @@ class PermlogUtil {
     $rowData = [];
     $pastRowMarker = FALSE;
     foreach ($lines as $line) {
-      if (trim($line) == '--') {
+      $line = trim($line);
+      if ($line == '--') {
         $pastRowMarker = TRUE;
         continue;
       }
       if (!$pastRowMarker) {
         list($label, $value) = explode("\t", $line);
+        // If this is the timetamp, format it with wp timezone.
+        // (We always use Unix timestamps on save, and format/tz-adjust them on display.
+        if ($label == 'Timestamp') {
+          $value = wp_date('Y-m-d H:i:s', $value);
+        }
         $headerData[$label] = $value;
       }
       else {

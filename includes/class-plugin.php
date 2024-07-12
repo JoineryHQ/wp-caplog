@@ -215,7 +215,8 @@ class PermlogPlugin {
     $headerLines = [];
     $headerLines['User'] = "{$current_user->user_login} (id={$current_user->ID})";
     $headerLines['Referer'] = $_SERVER['HTTP_REFERER'];
-    $headerLines['Timestamp'] = date('Y-m-d H:i:s', $timestamp);
+    // (We always use Unix timestamps on save, and format/tz-adjust them on display.
+    $headerLines['Timestamp'] = $timestamp;
 
     // Build and poplate an array of metadata to store in filename.
     // (The log list presents this data in a table, and it's easier to get

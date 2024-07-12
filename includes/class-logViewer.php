@@ -69,30 +69,34 @@ class PermlogLogViewer {
       <div class="notice">
         <p>See also: <a href="<?= $pluginData['PluginURI']; ?>" target="_blank">Documentation: <?= $pluginData['Name']; ?></a>.</p>
       </div>
-      <table id="permlog-loglist" class="wp-list-table widefat fixed striped table-view-list">
-        <thead>
-          <tr>
-            <th>Date/time</th>
-            <th>User</th>
-            <th>Roles Affected</th>
-            <th>Permissions Added?</th>
-            <th>Permissions Removed?</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php foreach ($logEntries as $logEntry): ?>
+      <?php if(!empty($logEntries)) : ?>
+        <table id="permlog-loglist" class="wp-list-table widefat fixed striped table-view-list">
+          <thead>
             <tr>
-              <td><?= $logEntry['timestamp'] ?></td>
-              <td><?= $logEntry['username'] ?></td>
-              <td><?= $logEntry['roles'] ?></td>
-              <td><?= $logEntry['added'] ?></td>
-              <td><?= $logEntry['removed'] ?></td>
-              <td><a href="admin.php?page=permlog_logviewer&file=<?= $logEntry['filename'] ?>">View</a></td>
+              <th>Date/time</th>
+              <th>User</th>
+              <th>Roles Affected</th>
+              <th>Permissions Added?</th>
+              <th>Permissions Removed?</th>
+              <th></th>
             </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            <?php foreach ($logEntries as $logEntry): ?>
+              <tr>
+                <td><?= $logEntry['timestamp'] ?></td>
+                <td><?= $logEntry['username'] ?></td>
+                <td><?= $logEntry['roles'] ?></td>
+                <td><?= $logEntry['added'] ?></td>
+                <td><?= $logEntry['removed'] ?></td>
+                <td><a href="admin.php?page=permlog_logviewer&file=<?= $logEntry['filename'] ?>">View</a></td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      <?php else : ?>
+        <p>No log entries exist at this time.</p>
+      <?php endif; ?>
 
     <?php
   }
