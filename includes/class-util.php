@@ -95,14 +95,21 @@ class PermlogUtil {
   }
 
   /**
+   * Get a list of (full system path for) all log files.
+   */
+  public static function getLogFilesList() {
+    $logDir = self::getLogDir();
+    $logFiles = glob($logDir .'/*.log');
+    $logFiles = array_reverse($logFiles);
+    return $logFiles;
+  }
+  /**
    * Get a full, ordered list of log entries, formatted for display in log list.
    *
    * @return array
    */
   public static function getLogEntriesFormatted() {
-    $logDir = self::getLogDir();
-    $logFiles = glob($logDir .'/*.log');
-    $logFiles = array_reverse($logFiles);
+    $logFiles = self::getLogFilesList();
     $logEntries = [];
     foreach ($logFiles as $logFile) {
       $fileName = basename($logFile);
@@ -170,5 +177,34 @@ class PermlogUtil {
     <?php endif; ?>
 
     <?php
+  }
+
+  /**
+   * Get the number of days we're allowed to preserve log files.
+   * @return int
+   */
+  public static function getLogMaxAgeDays() {
+    // Hard-coded to 364 days. We can make this configurable later.
+    return 365;
+  }
+
+  /**
+   * Delete log files which exceed the maximum log file age.
+   */
+  public static function deleteOldLogs() {
+    // The lowest (oldest) allowable timestamp is [maxAgeDays * (seconds per day)] seconds ago.
+    $minFileNameTimestamp = time() - (self::getLogMaxAgeDays() * 24 * 60 * 60);
+
+    // Get all existing log files.
+    $logFiles = self::getLogFilesList();
+    foreach ($logFiles as $logFile) {
+      $fileName = basename($logFile);
+      list($fileNameTimestamp, $junk, $junk) = explode('.', $fileName);
+      if ($fileNameTimestamp < $minFileNameTimestamp) {
+        // If the timestamp (as shown in the filename) is less than the minimum
+        // allowable timestamp, delete the file.
+        unlink($logFile);
+      }
+    }
   }
 }

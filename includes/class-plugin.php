@@ -246,5 +246,8 @@ class PermlogPlugin {
     fputs($fp, "--\n");
     fputs($fp, "$diffLines\n");
     fclose($fp);
+
+    // Finally, cleanup any too-old log files.
+    PermlogUtil::deleteOldLogs();
   }
 }
