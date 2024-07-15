@@ -43,6 +43,9 @@ class PermlogLogViewer {
       self::logSingleHtml($_GET['file']);
     }
     else {
+      // Purge old logs before creating the list.
+      PermlogUtil::deleteOldLogs();
+      // Show the list of log entries.
       self::logListHtml();
     }
 
