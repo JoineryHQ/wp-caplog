@@ -67,6 +67,7 @@ class PermlogLogViewer {
     <div class="wrap">
       <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
       <div class="notice">
+        <p>Log entries are removed after <?= PermlogUtil::getLogMaxAgeDays() ?> days.</p>
         <p>See also: <a href="<?= $pluginData['PluginURI']; ?>" target="_blank">Documentation: <?= $pluginData['Name']; ?></a>.</p>
       </div>
       <?php if(!empty($logEntries)) : ?>
