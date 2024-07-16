@@ -35,3 +35,5 @@ No configuration is required; no configuration options are available.
 ## Support
 
 Support for this plugin is handled under Joinery's ["As-Is Support" policy](https://joineryhq.com/software-support-levels#as-is-support).
+
+Public issue queue for this plugin: https://github.com/JoineryHQ/wp-permlog/issues
