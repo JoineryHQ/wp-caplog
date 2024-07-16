@@ -156,8 +156,8 @@ class CaplogPlugin {
     // Initialize the final array to return;
     $diff = [];
 
-    // We don't want to bother comparing 'administrator' capabilities, so unset them.
-    unset($oldCaps['administrator'], $newCaps['administrator']);
+    $oldCaps = CaplogUtil::sanitizeCaps($oldCaps);
+    $newCaps = CaplogUtil::sanitizeCaps($newCaps);
 
     foreach ($oldCaps as $oldRole => $oldRoleProperties) {
       if (!empty($oldRoleProperties['capabilities'])) {
@@ -233,6 +233,7 @@ class CaplogPlugin {
       't' => $timestamp,
       'r' => $rolesAffected,
       'a' => $actions,
+      'm' => microtime(),
     ];
 
     // Create the filename based on that filename metadata.

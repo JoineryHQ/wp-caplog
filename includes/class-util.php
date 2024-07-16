@@ -19,7 +19,7 @@ class CaplogUtil {
   /**
    * Given a set of metdata for a log file, create a base64-encoded filename containing that data.
    *
-   * Filename will be prefixed by $timestamp for ease of sorting.
+   * Filename will be prefixed by $tim3estamp for ease of sorting and for identifying old files to purge.
    *
    * @param int $timestamp
    * @param array $metaData
@@ -213,5 +213,25 @@ class CaplogUtil {
         unlink($logFile);
       }
     }
+  }
+
+  /**
+   * Sanitize capabilities array by removing values we don't want to compare.
+   *
+   * - Administrator role is not to be compared.
+   * - Capabilities with a value of 'false' are removed (we'll only compare those that are actually 'true').
+   *
+   * @param Array $caps As contained in wp option 'wp_user_roles'.
+   * @return Array, modified.
+   */
+  public static function sanitizeCaps($caps) {
+    // We don't want to bother comparing 'administrator' capabilities, so unset them.
+    unset($caps['administrator']);
+
+    foreach ($caps as $role => &$roleProperties) {
+      $roleProperties['capabilities'] = array_filter($roleProperties['capabilities']);
+    }
+
+    return $caps;
   }
 }
