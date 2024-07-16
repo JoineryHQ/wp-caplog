@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Utility methods for permlog plugin.
+ * Utility methods for caplog plugin.
  */
-class PermlogUtil {
+class CaplogUtil {
 
   /**
    * Get array of plugin metadata.
@@ -11,7 +11,7 @@ class PermlogUtil {
   public static function getPluginData() {
     static $pluginData;
     if (!isset($pluginData)) {
-      $pluginData = get_plugin_data(__DIR__ . '/../permlog.php');
+      $pluginData = get_plugin_data(__DIR__ . '/../caplog.php');
     }
     return $pluginData;
   }
@@ -51,7 +51,7 @@ class PermlogUtil {
    */
   public static function getLogDir() {
     $uploadDir = wp_upload_dir('', FALSE);
-    $logDir = $uploadDir['basedir'] . '/' . 'permlog';
+    $logDir = $uploadDir['basedir'] . '/' . 'caplog';
     if (!is_dir($logDir)) {
       mkdir($logDir);
     }
@@ -155,26 +155,26 @@ class PermlogUtil {
     ?>
 
     <?php if (!empty($headerData)) : ?>
-      <table id="permlog-headers"><tbody>
+      <table id="caplog-headers"><tbody>
       <?php foreach ($headerData as $label => $value) : ?>
-        <tr><th class="permlog-label"><?= $label ?></th><td><?= $value ?></td></tr>
+        <tr><th class="caplog-label"><?= $label ?></th><td><?= $value ?></td></tr>
       <?php endforeach;?>
       </tbody></table>
     <?php endif; ?>
 
     <?php if (!empty($rowData)) : ?>
-      <table id="permlog-rows" class="wp-list-table widefat fixed striped table-view-list">
+      <table id="caplog-rows" class="wp-list-table widefat fixed striped table-view-list">
         <thead>
           <tr>
             <th>Action</th>
-            <th>Permission</th>
+            <th>Capability</th>
             <th>Role</th>
           </tr>
         </thead>
         <tbody>
         <?php foreach ($rowData as $row) : ?>
           <tr>
-            <td class="permlog-action permlog-action-<?= $row[0] ?>"><?= $row[0] ?></td>
+            <td class="caplog-action caplog-action-<?= $row[0] ?>"><?= $row[0] ?></td>
             <td><?= $row[2] ?></td>
             <td><?= $row[1] ?></td>
           </tr>

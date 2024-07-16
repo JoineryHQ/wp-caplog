@@ -1,19 +1,19 @@
-table#permlog-headers {
+table#caplog-headers {
   margin-top: 1em;
   margin-bottom: 1em;
 }
 
-table#permlog-headers th {
+table#caplog-headers th {
   text-align: right;
 }
-table#permlog-headers td {
+table#caplog-headers td {
   text-align: left;
   padding-left: 1em;
 }
 
-table#permlog-rows td.permlog-action-removed {
+table#caplog-rows td.caplog-action-removed {
   color: red; 
 }
-table#permlog-rows td.permlog-action-added {
+table#caplog-rows td.caplog-action-added {
   color: green; 
 }

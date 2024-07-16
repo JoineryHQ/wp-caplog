@@ -10,18 +10,18 @@
  *
  * @link              https://joineryhq.com
  * @since             1.0.0
- * @package           Permlog
+ * @package           Caplog
  *
  * @wordpress-plugin
- * Plugin Name:       Permissions Logger
- * Plugin URI:        https://github.com/JoineryHQ/wp-permlog
- * Description:       Log all changes to WordPress role permissions
+ * Plugin Name:       Capabilities Logger
+ * Plugin URI:        https://github.com/JoineryHQ/wp-caplog
+ * Description:       Log all changes to WordPress role capabilities
  * Version:           1.0.0
  * Author:            Allen Shaw
  * Author URI:        https://joineryhq.com/
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * Text Domain:       permlog
+ * Text Domain:       caplog
  * Domain Path:       /languages
  */
 
@@ -47,10 +47,10 @@ require plugin_dir_path(__FILE__) . 'includes/class-util.php';
  *
  * @since    1.0.0
  */
-function run_permlog() {
+function run_caplog() {
 
-	$plugin = new PermlogPlugin();
+	$plugin = new CaplogPlugin();
 	$plugin->run();
 
 }
-run_permlog();
+run_caplog();
