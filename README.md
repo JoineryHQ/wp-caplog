@@ -21,6 +21,7 @@ Each log entry provides a detailed view of the action, including the following:
 * Date and time of the change.
 * URL of the page on which the change was made.
 * A detailed list of every capability added and/or removed from each affected role.
+* (Note that changes to the Administrator role are not logged, because this role already has "all permissions".)
 
 To conserve disk space, any log entries over 365 days old are periodically removed.
 
