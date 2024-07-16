@@ -4,6 +4,14 @@
  * Utility methods for caplog plugin.
  */
 class CaplogUtil {
+  /**
+   * A central location for static variable storage.
+   * @var array
+   * ```
+   * `CaplogUtil::$statics[__CLASS__]['foo'] = 'bar';
+   * ```
+   */
+  public static $statics = [];
 
   /**
    * Get array of plugin metadata.

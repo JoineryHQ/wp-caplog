@@ -38,7 +38,9 @@ class CaplogPlugin {
 
     // Reference https://developer.wordpress.org/reference/hooks/update_option_option/
     // We'll use this hook to respond to non-civicrm changes to capabilities.
-    add_action('update_option_wp_user_roles', ['CaplogPlugin', 'updateWpUserRoles'], 10, 3);
+    global $wpdb;
+    $updateRolesActionName = 'update_option_' . $wpdb->prefix . 'user_roles';
+    add_action($updateRolesActionName, ['CaplogPlugin', 'updateWpUserRoles'], 10, 3);
 
     // civicrm_access_roles is called on every civicrm page init; this is the only
     // way I've found to reliably check the final capabilities after submission
@@ -73,11 +75,11 @@ class CaplogPlugin {
    */
   public static function civicrmAccessRoles($args){
     // Check whether we've just submitted the civicrm "WordPress Access Control" form
-    $isFormValidate = Civi::$statics['CAPLOG_IS_CIVICRM_CAPABILITY_FORM'];
+    $isFormValidate = CaplogUtil::$statics['CAPLOG_IS_CIVICRM_CAPABILITY_FORM'];
     if ($isFormValidate) {
       // If we have, then we should have a snapshot of pre-submission capabilities,
       // which we can compare to current capabilities.
-      $diffCapabilities = self::diffCapabilities(Civi::$statics['CAPLOG_OLD_CAPS'], get_option('wp_user_roles'));
+      $diffCapabilities = self::diffCapabilities(CaplogUtil::$statics['CAPLOG_OLD_CAPS'], wp_roles()->roles);
       if (!empty($diffCapabilities)) {
         // If there are any capability differences, log them.
         self::log($diffCapabilities);
@@ -98,8 +100,8 @@ class CaplogPlugin {
    */
   public static function civicrmValidateForm($formName, &$fields, &$files, &$form, &$errors){
     if ($formName == 'CRM_ACL_Form_WordPress_Permissions') {
-      Civi::$statics['CAPLOG_IS_CIVICRM_CAPABILITY_FORM'] = TRUE;
-      Civi::$statics['CAPLOG_OLD_CAPS'] = get_option('wp_user_roles');
+      CaplogUtil::$statics['CAPLOG_IS_CIVICRM_CAPABILITY_FORM'] = TRUE;
+      CaplogUtil::$statics['CAPLOG_OLD_CAPS'] = wp_roles()->roles;
     }
   }
 
@@ -115,7 +117,7 @@ class CaplogPlugin {
    */
   public static function updateWpUserRoles($oldValue, $newValue, $option) {
     // Check whether we've just submitted the civicrm "WordPress Access Control" form
-    $isFormValidate = Civi::$statics['CAPLOG_IS_CIVICRM_CAPABILITY_FORM'];
+    $isFormValidate = CaplogUtil::$statics['CAPLOG_IS_CIVICRM_CAPABILITY_FORM'];
     if (!$isFormValidate) {
       // If we're not, then this is some other mechanism modifying user capabilities.
       // So just compare the capabilities $oldValue and $newValue.
@@ -215,6 +217,7 @@ class CaplogPlugin {
     $headerLines = [];
     $headerLines['User'] = "{$current_user->user_login} (id={$current_user->ID})";
     $headerLines['Referer'] = $_SERVER['HTTP_REFERER'];
+    $headerLines['Is wp-cli'] = (defined(WP_CLI) && WP_CLI ? 'Yes' : 'No');
     // (We always use Unix timestamps on save, and format/tz-adjust them on display.
     $headerLines['Timestamp'] = $timestamp;
 
