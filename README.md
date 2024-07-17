@@ -9,8 +9,7 @@ This plugin aims to maintain a log of any changes to the capabilities granted to
 It has been specifically tested to log such changes initiated by these mechanisms:
 * [CiviCRM](https://civicrm.org/)'s "WordPress Access Control" form.
 * The [User Role Editor](https://wordpress.org/plugins/user-role-editor/) plugin.
-* The [Members](https://wordpress.org/plugins/members/) plugin; note that changes made
-  by this plugin will result in one log entry per capability/role.
+* The [Members](https://wordpress.org/plugins/members/) plugin.
 
 ## Usage
 
