@@ -42,19 +42,8 @@ class CaplogPlugin {
     $updateRolesActionName = 'update_option_' . $wpdb->prefix . 'user_roles';
     add_action($updateRolesActionName, ['CaplogPlugin', 'updateWpUserRoles'], 10, 3);
 
-    // civicrm_access_roles is called on every civicrm page init; this is the only
-    // way I've found to reliably check the final capabilities after submission
-    // of civicrm's "WordPress Access Control" form (I thought to use hook_civicrm_postProcess,
-    // but this form uses civicrm_exit() before that hook is fired.)
-    add_filter( 'civicrm_access_roles', ['CaplogPlugin', 'civicrmAccessRoles'], 10, 1);
-
-    // We'll use this hook to identify when civicrm's "WordPress Access Control"
-    // form has been submitted. This is an important distinction, because civicrm
-    // has a, well, unusual way of managing changes submited in this form, which is:
-    // remove all civicrm-related capabilities, and then add them back one-at-a-time. So if
-    // we blithely respond on the update_option_wp_user_roles, we'll never be
-    // able to compare before-and after.
-    add_filter( 'civicrm_validateForm', ['CaplogPlugin', 'civicrmValidateForm'], 10, 5 );
+    // Register a shutdown handler to catch the final (we hope) state of things.
+    add_action('shutdown', ['CaplogPlugin', 'wpShutdown'], 10);
 
     // Register a "log entries list" page for this plugin.
     add_action('admin_menu', array('CaplogLogViewer', 'addLogViewerMenu'), 9);
@@ -66,64 +55,46 @@ class CaplogPlugin {
 	}
 
   /**
-   * Hook listener for civicrm_access_roles filter. This hook gets called a lot; we'll
-   * only take action if we've just submitted the "WordPress Access Control"
-   * form.
-   *
-   * @param array $args
-   * @return array $args as received, unchanged.
-   */
-  public static function civicrmAccessRoles($args){
-    // Check whether we've just submitted the civicrm "WordPress Access Control" form
-    $isFormValidate = CaplogUtil::$statics['CAPLOG_IS_CIVICRM_CAPABILITY_FORM'];
-    if ($isFormValidate) {
-      // If we have, then we should have a snapshot of pre-submission capabilities,
-      // which we can compare to current capabilities.
-      $diffCapabilities = self::diffCapabilities(CaplogUtil::$statics['CAPLOG_OLD_CAPS'], wp_roles()->roles);
-      if (!empty($diffCapabilities)) {
-        // If there are any capability differences, log them.
-        self::log($diffCapabilities);
-      }
-    }
-    // Return $args unchanged; without this, the upstream code execution breaks,
-    // and the current user can be blocked out of CiviCRM until some other WP
-    // admin page is loaded.
-    return $args;
-  }
-
-  /**
-   * Implements hook_civicrm_validateForm.
-   *
-   * We need this so that we can identify when we've submitted civicrm's "WP Capabilities"
-   * form, and so we can take a pre-modification snapshot of capabilities, for
-   * later post-modification comparison.
-   */
-  public static function civicrmValidateForm($formName, &$fields, &$files, &$form, &$errors){
-    if ($formName == 'CRM_ACL_Form_WordPress_Permissions') {
-      CaplogUtil::$statics['CAPLOG_IS_CIVICRM_CAPABILITY_FORM'] = TRUE;
-      CaplogUtil::$statics['CAPLOG_OLD_CAPS'] = wp_roles()->roles;
-    }
-  }
-
-  /**
    * Hook listener for update_option_wp_user_roles action.
    *
-   * We'll only take action if we're NOT submitting the civicrm "WP Capabilities"
-   * form.
+   * Gives us a chance to snapshot the 'original' caps config for later comparison.
    *
    * @param array $oldValue
    * @param array $newValue
    * @param string $option
    */
   public static function updateWpUserRoles($oldValue, $newValue, $option) {
-    // Check whether we've just submitted the civicrm "WordPress Access Control" form
-    $isFormValidate = CaplogUtil::$statics['CAPLOG_IS_CIVICRM_CAPABILITY_FORM'];
-    if (!$isFormValidate) {
-      // If we're not, then this is some other mechanism modifying user capabilities.
-      // So just compare the capabilities $oldValue and $newValue.
-      $diffCapabilities = self::diffCapabilities($oldValue, $newValue);
+    // Only on the first time this hook is called, we'll take a snapshot of the
+    // original values, to be referenced later in our 'shutdown' handler.
+    static $once = false;
+    if (!$once) {
+      $once = true;
+      CaplogUtil::$statics['CAPLOG_OLD_CAPS'] = $oldValue;
+    }
+  }
+
+
+  /**
+   * Hook listener for 'shutdown' action.
+   *
+   * We'll use this to gather the "final" (we hope) roles/capabilities configuration,
+   * and compare it to original equivalant config. We can then log all differences
+   * in one log entry (even though the 'update_option_wp_user_roles' hook may
+   * have fired many times for separate changes on this PHP invocation.)
+   *
+   * In theory, some other 'shutdown' hook may modify capabilities after this;
+   * such changes will not be logged.
+   */
+  public static function wpShutdown() {
+    if (!empty(CaplogUtil::$statics['CAPLOG_OLD_CAPS'])) {
+      // If static 'CAPLOG_OLD_CAPS' has a value, it means that 'update_option_wp_user_roles'
+      // was called earlier. We'll compare that original caps value to the current
+      // caps value, and log any differences.
+      $originalCaps = CaplogUtil::$statics['CAPLOG_OLD_CAPS'];
+      $finalCaps = wp_roles()->roles;
+      $diffCapabilities = self::diffCapabilities($originalCaps, $finalCaps);
       if (!empty($diffCapabilities)) {
-        // If there's a difference in capabilities, log that.
+        // If there are any capability differences, log them.
         self::log($diffCapabilities);
       }
     }
