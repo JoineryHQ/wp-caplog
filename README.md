@@ -10,6 +10,7 @@ It has been specifically tested to log such changes initiated by these mechanism
 * [CiviCRM](https://civicrm.org/)'s "WordPress Access Control" form.
 * The [User Role Editor](https://wordpress.org/plugins/user-role-editor/) plugin.
 * The [Members](https://wordpress.org/plugins/members/) plugin.
+* wp-cli (e.g. `wp cap add`, `wp cap remove`, or even `wp eval-file /path/to/custom/php/file`).
 
 ## Usage
 
@@ -21,6 +22,7 @@ Each log entry provides a detailed view of the action, including the following:
 * Username of the logged-in user at the time of the change.
 * Date and time of the change.
 * URL of the page on which the change was made.
+* Whether or not the action was initiated by wp-cli.
 * A detailed list of every capability added and/or removed from each affected role.
 * (Note that changes to the Administrator role are not logged, because this role already has "all capabilities".)
 
