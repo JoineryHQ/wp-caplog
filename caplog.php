@@ -14,9 +14,9 @@
  *
  * @wordpress-plugin
  * Plugin Name:       Capabilities Logger
- * Plugin URI:        https://github.com/JoineryHQ/wp-caplog/tree/v0.0.1
+ * Plugin URI:        https://github.com/JoineryHQ/wp-caplog/tree/v0.0.2
  * Description:       Log all changes to WordPress role capabilities
- * Version:           0.0.1
+ * Version:           0.0.2
  * Author:            Allen Shaw
  * Author URI:        https://joineryhq.com/
  * License:           GPL-2.0+
