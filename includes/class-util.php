@@ -226,16 +226,14 @@ class CaplogUtil {
   /**
    * Sanitize capabilities array by removing values we don't want to compare.
    *
-   * - Administrator role is not to be compared.
    * - Capabilities with a value of 'false' are removed (we'll only compare those that are actually 'true').
    *
    * @param Array $caps As contained in wp option 'wp_user_roles'.
    * @return Array, modified.
    */
   public static function sanitizeCaps($caps) {
-    // We don't want to bother comparing 'administrator' capabilities, so unset them.
-    unset($caps['administrator']);
-
+    // Remove any 'false' capabilities -- they're the same as if they did not exist,
+    // and removing them makes comparisons easier.
     foreach ($caps as $role => &$roleProperties) {
       $roleProperties['capabilities'] = array_filter($roleProperties['capabilities']);
     }
