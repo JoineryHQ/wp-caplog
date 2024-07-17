@@ -217,7 +217,7 @@ class CaplogPlugin {
     $headerLines = [];
     $headerLines['User'] = "{$current_user->user_login} (id={$current_user->ID})";
     $headerLines['Referer'] = $_SERVER['HTTP_REFERER'];
-    $headerLines['Is wp-cli'] = (defined(WP_CLI) && WP_CLI ? 'Yes' : 'No');
+    $headerLines['Is wp-cli'] = (defined('WP_CLI') && WP_CLI ? 'Yes' : 'No');
     // (We always use Unix timestamps on save, and format/tz-adjust them on display.
     $headerLines['Timestamp'] = $timestamp;
 
