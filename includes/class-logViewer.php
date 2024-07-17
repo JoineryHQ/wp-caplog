@@ -71,7 +71,7 @@ class CaplogLogViewer {
       <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
       <div class="notice">
         <p>Log entries are removed after <?= CaplogUtil::getLogMaxAgeDays() ?> days.</p>
-        <p>See also: <a href="<?= $pluginData['PluginURI']; ?>" target="_blank">Documentation: <?= $pluginData['Name']; ?></a>.</p>
+        <p>See also: <a href="<?= $pluginData['PluginURI']; ?>" target="_blank">Documentation for <?= $pluginData['Name']; ?> (v<?= $pluginData['Version'] ?>)</a>.</p>
       </div>
       <?php if(!empty($logEntries)) : ?>
         <table id="caplog-loglist" class="wp-list-table widefat fixed striped table-view-list">
